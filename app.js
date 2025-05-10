@@ -9,6 +9,8 @@ app.use(cors()); // 允许跨域
 app.use(express.json()); // 解析json请求体
 
 // 路由
+app.use('/api/user', require('./routes/user'));
+app.use('/api/note', require('./routes/travelNote'));
 app.use('/api/review', require('./routes/review'));
 app.use('/api/admin', require('./routes/admin'));
 
