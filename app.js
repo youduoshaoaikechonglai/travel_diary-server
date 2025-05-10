@@ -8,6 +8,10 @@ const app = express();
 app.use(cors()); // 允许跨域
 app.use(express.json()); // 解析json请求体
 
+// 路由
+app.use('/api/review', require('./routes/review'));
+app.use('/api/admin', require('./routes/admin'));
+
 app.get('/', (req, res) => {
   res.send('旅游日记平台后端API');
 });
