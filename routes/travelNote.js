@@ -39,9 +39,16 @@ router.put('/:id', async (req, res) => {
     const note = await TravelNote.findById(req.params.id);
     if (!note) return res.status(404).json({ message: '游记不存在' });
     if (note.status === 'approved') return res.status(403).json({ message: '已通过审核的游记不可编辑' });
-    Object.assign(note, req.body, { updatedAt: new Date() });
+
+    // 合并更新的字段，并将状态重置为"待审核"，同时删除拒绝原因
+    Object.assign(note, req.body, {
+      updatedAt: new Date(),
+      status: 'pending',
+      rejectReason: undefined
+    });
+    
     await note.save();
-    res.json({ message: '游记更新成功' });
+    res.json({ message: '游记更新成功，等待审核' });
   } catch (err) {
     res.status(500).json({ message: '编辑游记失败', error: err });
   }
