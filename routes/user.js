@@ -8,15 +8,20 @@ const path = require('path');
 // 客户端用户
 // 用户注册
 router.post('/register', async (req, res) => {
-  const { username, password } = req.body;
-  if (!username || !password) {
-    return res.status(400).json({ message: '用户名和密码必填' });
+  const { username, password, nickname, avatar } = req.body;
+  if (!username || !password || !nickname) {
+    return res.status(400).json({ message: '用户名、密码和昵称必填' });
   }
   try {
     const exist = await User.findOne({ username });
     if (exist) return res.status(409).json({ message: '用户名已存在' });
     const hash = await bcrypt.hash(password, 10);
-    const user = new User({ username, password: hash });
+    const user = new User({
+      username,
+      password: hash,
+      nickname,
+      avatarUrl: avatar
+    });
     await user.save();
     res.json({ message: '注册成功' });
   } catch (err) {
