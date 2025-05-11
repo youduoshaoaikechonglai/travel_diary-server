@@ -10,7 +10,15 @@ const BASE_URL = 'http://localhost:3001'; // 根据实际环境配置
 // 配置文件上传
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, '../uploads'));
+    let uploadPath = '';
+    if (file.fieldname === 'avatar') {
+      uploadPath = path.join(__dirname, '../uploads/icon');
+    } else if (file.fieldname === 'video') {
+      uploadPath = path.join(__dirname, '../uploads/videos');
+    } else {
+      uploadPath = path.join(__dirname, '../uploads/images');
+    }
+    cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -70,7 +78,7 @@ router.post('/avatar', upload.single('avatar'), async (req, res) => {
       return res.status(400).json({ message: '未上传文件' });
     }
 
-    const avatarUrl = `/uploads/${req.file.filename}`;
+    const avatarUrl = `/uploads/icon/${req.file.filename}`;
     const fullUrl = `${BASE_URL}${avatarUrl}`;
 
     // 如果提供了用户ID，更新用户头像
@@ -85,13 +93,14 @@ router.post('/avatar', upload.single('avatar'), async (req, res) => {
 });
 
 // 上传游记图片（支持多图）
-router.post('/travel-images', upload.array('images', 10), (req, res) => {
+router.post('/travel-images', upload.single('images'), (req, res) => {
   try {
-    if (!req.files || req.files.length === 0) {
+    if (!req.file) {
       return res.status(400).json({ message: '未上传文件' });
     }
-    const urls = req.files.map(file => `${BASE_URL}/uploads/${file.filename}`);
-    res.json({ urls });
+    const imageurls = `/uploads/images/${req.file.filename}`;
+    const fullUrl = `${BASE_URL}${imageurls}`;
+    res.json({ url: fullUrl });
   } catch (err) {
     res.status(500).json({ message: '上传图片失败', error: err });
   }
@@ -103,8 +112,9 @@ router.post('/travel-video', upload.single('video'), (req, res) => {
     if (!req.file) {
       return res.status(400).json({ message: '未上传文件' });
     }
-    const url = `${BASE_URL}/uploads/${req.file.filename}`;
-    res.json({ url });
+    const videoUrl = `/uploads/videos/${req.file.filename}`;
+    const fullUrl = `${BASE_URL}${videoUrl}`;
+    res.json({ url: fullUrl });
   } catch (err) {
     res.status(500).json({ message: '上传视频失败', error: err });
   }

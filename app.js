@@ -8,7 +8,7 @@ const app = express();
 // 中间件
 // 配置CORS，允许跨域请求
 app.use(cors({
-  origin: ['http://localhost:10086', 'http://192.168.245.1:10086'],
+  origin: ['http://localhost:10086', 'http://10.163.206.25:10086', 'http://localhost:3000'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true // 允许发送凭证
