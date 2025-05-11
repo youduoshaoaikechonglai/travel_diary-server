@@ -2,26 +2,37 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
-const multer = require('multer');
-const path = require('path');
 
 // 客户端用户
 // 用户注册
 router.post('/register', async (req, res) => {
-  const { username, password, nickname, avatar } = req.body;
-  if (!username || !password || !nickname) {
-    return res.status(400).json({ message: '用户名、密码和昵称必填' });
+  const { username, password, nickname, avatarUrl } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ message: '用户名和密码必填' });
   }
+
   try {
     const exist = await User.findOne({ username });
     if (exist) return res.status(409).json({ message: '用户名已存在' });
     const hash = await bcrypt.hash(password, 10);
-    const user = new User({
+
+    // 创建用户数据对象，确保所有必需字段都有值
+    const userData = {
       username,
-      password: hash,
-      nickname,
-      avatarUrl: avatar
-    });
+      password: hash
+    };
+
+    // 只有当nickname有值时才添加到userData
+    if (nickname) {
+      userData.nickname = nickname;
+    }
+
+    // 只有当avatarUrl有值时才添加到userData
+    if (avatarUrl) {
+      userData.avatarUrl = avatarUrl;
+    }
+    const user = new User(userData);
     await user.save();
     res.json({ message: '注册成功' });
   } catch (err) {
@@ -57,22 +68,4 @@ router.get('/check-nickname', async (req, res) => {
   res.json({ exists: !!exist });
 });
 
-// 头像上传
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, '../public/avatars'));
-  },
-  filename: function (req, file, cb) {
-    const ext = path.extname(file.originalname);
-    cb(null, Date.now() + ext);
-  }
-});
-const upload = multer({ storage });
-
-router.post('/upload-avatar', upload.single('file'), (req, res) => {
-  if (!req.file) return res.status(400).json({ message: '未上传文件' });
-  const url = `/public/avatars/${req.file.filename}`;
-  res.json({ url });
-});
-
-module.exports = router; 
+module.exports = router;
