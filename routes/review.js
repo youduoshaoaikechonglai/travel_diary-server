@@ -3,10 +3,17 @@ const router = express.Router();
 const TravelNote = require('../models/TravelNote');
 const ReviewRecord = require('../models/ReviewRecord');
 
-// 获取所有待审核、已通过、未通过的游记（审核列表）
+// 获取游记（支持按状态筛选）
 router.get('/notes', async (req, res) => {
   try {
-    const notes = await TravelNote.find().sort({ createdAt: -1 });
+    const { status } = req.query;
+    // 构建查询条件
+    const query = {};
+    // 如果传入了状态参数且状态参数有效，则按状态筛选
+    if (status && ['approved', 'rejected'].includes(status)) {
+      query.status = status;
+    }
+    const notes = await TravelNote.find(query).sort({ createdAt: -1 });
     res.json(notes);
   } catch (err) {
     res.status(500).json({ message: '获取审核列表失败', error: err });
@@ -46,13 +53,13 @@ router.delete('/note/:id', async (req, res) => {
 });
 
 // 获取审核记录
-router.get('/records/:noteId', async (req, res) => {
-  try {
-    const records = await ReviewRecord.find({ noteId: req.params.noteId }).sort({ createdAt: -1 });
-    res.json(records);
-  } catch (err) {
-    res.status(500).json({ message: '获取审核记录失败', error: err });
-  }
-});
+// router.get('/records/:noteId', async (req, res) => {
+//   try {
+//     const records = await ReviewRecord.find({ noteId: req.params.noteId }).sort({ createdAt: -1 });
+//     res.json(records);
+//   } catch (err) {
+//     res.status(500).json({ message: '获取审核记录失败', error: err });
+//   }
+// });
 
 module.exports = router; 

@@ -88,8 +88,8 @@
 - `DELETE /api/note/:id` 删除游记
 - `GET /api/note/:id` 获取游记详情
 
-### 审核与后台
-- `GET /api/review/notes` 获取所有游记（审核列表）
+### 后台相关
+- `GET /api/review/notes` 获取游记列表（支持按状态筛选）
 - `POST /api/review/action` 审核操作（通过/拒绝）
 - `DELETE /api/review/note/:id` 删除游记（管理员）
 - `POST /api/admin/login` 后台用户登录
