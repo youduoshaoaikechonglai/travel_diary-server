@@ -22,7 +22,7 @@ const storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const ext = path.extname(file.originalname) || '.jpg'; // 提供默认扩展名
+    const ext = path.extname(file.originalname) || '.mp4'; // 提供默认扩展名
     // 根据文件类型设置不同前缀
     let prefix = 'image-';
     if (file.fieldname === 'avatar') {

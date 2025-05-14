@@ -10,7 +10,7 @@ router.get('/notes', async (req, res) => {
     // 构建查询条件
     const query = {};
     // 如果传入了状态参数且状态参数有效，则按状态筛选
-    if (status && ['approved', 'rejected'].includes(status)) {
+    if (status && ['pending', 'approved', 'rejected'].includes(status)) {
       query.status = status;
     }
     const notes = await TravelNote.find(query).sort({ createdAt: -1 });
